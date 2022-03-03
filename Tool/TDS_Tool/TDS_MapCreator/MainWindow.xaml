@@ -4,32 +4,86 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="TDS Editor" Height="450" Width="800">
+        Title="TDS Editor" Height="464" Width="800"
+        MinHeight="464" MinWidth="400">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
-                <MenuItem Header="Load Map" />
-                <MenuItem Header="Load spritesheet" />
-                <MenuItem Header="Quit" />
+                <MenuItem Header="Load Map" 
+                          Click="LoadMap_Click"/>
+                <MenuItem Header="Save Map" 
+                          Click="SaveMap_Click"/>
+                <MenuItem Header="Quit" 
+                          Click="Quit_Click"/>
             </MenuItem>
 
             <MenuItem Header="Help">
-                <MenuItem Header="View Help"/>
-                <MenuItem Header="About"/>
+                <MenuItem Header="View Help" />
+                <MenuItem Header="About" />
             </MenuItem>
         </Menu>
 
-        <TabControl TabStripPlacement="left">
-            <TabItem Header="Map">
-                <Grid>
-                    
-                </Grid>
-                
-            </TabItem>
-            <TabItem Header="Spritesheet">
-                
-                
-            </TabItem>
-        </TabControl>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="150" />
+            </Grid.ColumnDefinitions>
+
+            <ScrollViewer Grid.Column="0"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
+                <Grid x:Name="MapGrid"/>
+            </ScrollViewer>
+
+            <StackPanel Grid.Column="1">
+                <GroupBox Header="Map"
+                          Margin="10"
+                          Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Width" />
+                        <TextBox Text="15" 
+                                 x:Name="MapWidth"/>
+                        <TextBlock Text="Height" />
+                        <TextBox Text="10" 
+                                 x:Name="MapHeight"/>
+                        <Button Content="New Map" 
+                                Margin="0 5 0 0"
+                                Click="NewMap_Click"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Scale"
+                          Margin="10 0"
+                          Padding="10">
+                    <TextBox Text="2"
+                             x:Name="MapScale"/>
+                </GroupBox>
+
+                <GroupBox Header="TileType"
+                          Margin="10"
+                          Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Type" />
+                        <ComboBox x:Name="TileTypeSelector">
+                            <ComboBoxItem Content="Map"/>
+                            <ComboBoxItem Content="Buildings" />
+                            <ComboBoxItem Content="Units" />
+                        </ComboBox>
+                        
+                        <TextBlock Text="Tile" Margin="0 10 0 0"/>
+                        <ComboBox x:Name="TileSelector"
+                                  MaxDropDownHeight="180">
+                        </ComboBox>
+                        
+                        <TextBlock Text="Color"
+                                   Margin="0 10 0 0"/>
+                        <ComboBox x:Name="ColorSelector"
+                                  MaxDropDownHeight="180">
+                            
+                        </ComboBox>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
     </DockPanel>
 </Window>
