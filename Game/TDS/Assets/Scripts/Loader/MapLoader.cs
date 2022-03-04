@@ -23,14 +23,64 @@ public class MapLoader : MonoBehaviour
             {
                 TileContent tile = tiles[x, y];
                 if (tile.BuildingID != 0)
-                    map.SetTile(new Vector3Int(x, height - y -1), spriteData.BuildingSprites[tile.BuildingID - 2]);
+                {
+                    map.SetTile(new Vector3Int(x, height - y - 1),
+                        GetBuildingTile(tile.BuildingID));
+                }
                 else
-                    map.SetTile(new Vector3Int(x, height - y - 1), spriteData.MapSprites[tile.TileID]);
-
+                {
+                    map.SetTile(new Vector3Int(x, height - y - 1),
+                        GetMapTile(tile.TileID));
+                }
                 if (tile.UnitID != 0)
-                    units.SetTile(new Vector3Int(x, height - y - 1), spriteData.UnitSprites[tile.UnitID - 1]);
+                {
+                    units.SetTile(new Vector3Int(x, height - y - 1),
+                        GetUnitTile(tile.UnitID));
+                }
             }
         }
         map.RefreshAllTiles();
+    }
+
+    private TileBase GetMapTile(int mapTileID)
+    {
+        return spriteData.MapSprites[mapTileID];
+    }
+
+    private TileBase GetBuildingTile(int buildingID)
+    {
+        int buildingIndex = ToIndex(buildingID);
+        int colorIndex = ToColorIndex(buildingID);
+
+        return colorIndex switch
+        {
+            0 => spriteData.BuildingSpritesNeutral[buildingIndex - 1],
+            1 => spriteData.BuildingSpritesRed[buildingIndex - 1],
+            2 => spriteData.BuildingSpritesBlack[buildingIndex - 1],
+            _ => null,
+        };
+    }
+
+    private TileBase GetUnitTile(int unitID)
+    {
+        int unitIndex = ToIndex(unitID);
+        int colorIndex = ToColorIndex(unitID);
+
+        return colorIndex switch
+        {
+            0 => spriteData.UnitSpritesRed[unitIndex - 1],
+            1 => spriteData.UnitSpritesBlack[unitIndex - 1],
+            _ => null,
+        };
+    }
+
+    private int ToIndex(int ID)
+    {
+        return ID & 0b0001_1111;
+    }
+
+    private int ToColorIndex(int ID)
+    {
+        return (ID & 0b1110_0000) >> 5;
     }
 }

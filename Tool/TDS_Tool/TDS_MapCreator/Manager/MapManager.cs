@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TDS_MapCreator.Tiles;
@@ -28,7 +29,7 @@ namespace TDS_MapCreator
         private readonly TextBox scaleTextBox;
         private int tileScale = 2;
 
-        private TileContent[,] mapTiles;
+        private TileContent[,] tiles;
         private Image[,] tileImages;
         private Image[,] buildingImages;
         private Image[,] unitImages;
@@ -36,6 +37,7 @@ namespace TDS_MapCreator
         public MapManager(Grid grid, TextBox width, TextBox height, TextBox scale)
         {
             mapGrid = grid;
+            mapGrid.PreviewMouseWheel += MapGrid_PreviewMouseWheel;
 
             widthTextBox = width;
             widthTextBox.Text = MIN_WIDTH.ToString();
@@ -55,6 +57,25 @@ namespace TDS_MapCreator
 
         #region Place and Remove
 
+        private void Place(int posX, int posY)
+        {
+            int typeIndex = MainWindow.TileSeletionManager.GetTypeIndex();
+            switch (typeIndex)
+            {
+                case 0:
+                    PlaceTile(posX, posY);
+                    break;
+
+                case 1:
+                    PlaceBuilding(posX, posY);
+                    break;
+
+                case 2:
+                    PlaceUnit(posX, posY);
+                    break;
+            }
+        }
+
         private void PlaceTile(int posX, int posY)
         {
             int tileIndex = MainWindow.TileSeletionManager.GetTileIndex();
@@ -63,14 +84,14 @@ namespace TDS_MapCreator
             if (tileIndex != (int)TileType.Grass)
                 PlaceBuilding(posX, posY, 0);
 
-            int unitIndex = DataUtilities.ToIndex(mapTiles[posX, posY].UnitID);
+            int unitIndex = DataUtilities.ToIndex(tiles[posX, posY].UnitID);
             if (unitIndex != 0 && !DataUtilities.unitTileMatrix[unitIndex - 1, tileIndex])
                 PlaceUnit(posX, posY, 0);
         }
 
         private void PlaceTile(int posX, int posY, int tileIndex)
         {
-            mapTiles[posX, posY].TileID = tileIndex;
+            tiles[posX, posY].TileID = tileIndex;
             tileImages[posX, posY].Source = new BitmapImage(DataUtilities.TileSprites[tileIndex]);
         }
 
@@ -88,7 +109,7 @@ namespace TDS_MapCreator
 
                 PlaceTile(posX, posY, (int)TileType.Grass);
 
-                int unitIndex = DataUtilities.ToIndex(mapTiles[posX, posY].UnitID);
+                int unitIndex = DataUtilities.ToIndex(tiles[posX, posY].UnitID);
                 if (unitIndex != 0 && !DataUtilities.unitTileMatrix[unitIndex - 1, (int)TileType.Grass])
                     PlaceUnit(posX, posY, 0);
 
@@ -104,7 +125,7 @@ namespace TDS_MapCreator
             int buildingIndex = DataUtilities.ToIndex(buildingID);
             int colorIndex = DataUtilities.ToColorIndex(buildingID);
 
-            mapTiles[posX, posY].BuildingID = buildingID;
+            tiles[posX, posY].BuildingID = buildingID;
             if (buildingIndex == 0)
                 buildingImages[posX, posY].Source = null;
             else
@@ -113,7 +134,7 @@ namespace TDS_MapCreator
 
         private void PlaceBuilding(int posX, int posY, int buildingIndex, int colorIndex)
         {
-            mapTiles[posX, posY].BuildingID = DataUtilities.ToID(buildingIndex, colorIndex);
+            tiles[posX, posY].BuildingID = DataUtilities.ToID(buildingIndex, colorIndex);
             if (buildingIndex == 0)
                 buildingImages[posX, posY].Source = null;
             else
@@ -129,7 +150,7 @@ namespace TDS_MapCreator
                 PlaceUnit(posX, posY, 0);
             else
             {
-                int tile = mapTiles[posX, posY].TileID;
+                int tile = tiles[posX, posY].TileID;
                 if (DataUtilities.unitTileMatrix[tileIndex - 1, tile])
                     PlaceUnit(posX, posY, tileIndex, colorIndex);
             }
@@ -140,7 +161,7 @@ namespace TDS_MapCreator
             int unitIndex = DataUtilities.ToIndex(UnitID);
             int colorIndex = DataUtilities.ToColorIndex(UnitID);
 
-            mapTiles[posX, posY].UnitID = UnitID;
+            tiles[posX, posY].UnitID = UnitID;
             if (unitIndex == 0)
                 unitImages[posX, posY].Source = null;
             else
@@ -149,21 +170,40 @@ namespace TDS_MapCreator
 
         private void PlaceUnit(int posX, int posY, int unitIndex, int colorIndex)
         {
-            mapTiles[posX, posY].UnitID = DataUtilities.ToID(unitIndex, colorIndex);
+            tiles[posX, posY].UnitID = DataUtilities.ToID(unitIndex, colorIndex);
             if (unitIndex == 0)
                 unitImages[posX, posY].Source = null;
             else
                 unitImages[posX, posY].Source = new BitmapImage(DataUtilities.UnitSprites[colorIndex][unitIndex - 1]);
         }
 
+        private void Remove(int posX, int posY)
+        {
+            int typeIndex = MainWindow.TileSeletionManager.GetTypeIndex();
+            switch (typeIndex)
+            {
+                case 0:
+                    PlaceTile(posX, posY, 0);
+                    break;
+
+                case 1:
+                    PlaceBuilding(posX, posY, 0);
+                    break;
+
+                case 2:
+                    PlaceUnit(posX, posY, 0);
+                    break;
+            }
+        }
+
         private void SearchAndRemoveHQ(int colorID)
         {
             int searchID = DataUtilities.ToID((int)BuildingType.HQ, colorID);
-            for (int x = 0; x < mapTiles.GetLength(0); x++)
+            for (int x = 0; x < tiles.GetLength(0); x++)
             {
-                for (int y = 0; y < mapTiles.GetLength(1); y++)
+                for (int y = 0; y < tiles.GetLength(1); y++)
                 {
-                    if (mapTiles[x, y].BuildingID == searchID)
+                    if (tiles[x, y].BuildingID == searchID)
                         PlaceBuilding(x, y, (int)BuildingType.None);
                 }
             }
@@ -193,7 +233,7 @@ namespace TDS_MapCreator
             e.Handled = true;
         }
 
-        private void ScaleTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void ScaleTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Enter)
             {
@@ -203,42 +243,55 @@ namespace TDS_MapCreator
             }
         }
 
-        private void Image_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        private void Image_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
-                Image_MouseDown(sender, null);
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Image image = (Image)sender;
+                int posX = Grid.GetColumn(image);
+                int posY = Grid.GetRow(image);
+
+                Place(posX, posY);
+            } 
+            else if (e.RightButton == MouseButtonState.Pressed)
+            {
+                Image image = (Image)sender;
+                int posX = Grid.GetColumn(image);
+                int posY = Grid.GetRow(image);
+
+                Remove(posX, posY);
+            }
         }
 
-        private void Image_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Image_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            FrameworkElement block = (FrameworkElement)sender;
+            Image_MouseEnter(sender, e);
+        }
 
-            int typeIndex = MainWindow.TileSeletionManager.GetTypeIndex();
-
-            int posX = Grid.GetColumn(block);
-            int posY = Grid.GetRow(block);
-            switch (typeIndex)
+        private void MapGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control)
             {
-                case 0:
-                    PlaceTile(posX, posY);
-                    break;
+                if (e.Delta > 0 && tileScale < MAX_SCALE)
+                {
+                    tileScale++;
+                    Rescale();
+                }
+                else if (e.Delta < 0 && tileScale > 1)
+                {
+                    tileScale--;
+                    Rescale();
+                }
 
-                case 1:
-                    PlaceBuilding(posX, posY);
-                    break;
-
-                case 2:
-                    PlaceUnit(posX, posY);
-                    break;
             }
         }
 
         #endregion Events
 
-        private void CreateGrid()
+        private void CreateGridFromData()
         {
-            int width = mapTiles.GetLength(0);
-            int height = mapTiles.GetLength(1);
+            int width = tiles.GetLength(0);
+            int height = tiles.GetLength(1);
 
             mapGrid.Children.Clear();
             mapGrid.ColumnDefinitions.Clear();
@@ -249,17 +302,17 @@ namespace TDS_MapCreator
             unitImages = new Image[width, height];
 
             int size = TILE_SIZE * tileScale;
-            mapGrid.Width = size * mapTiles.GetLength(0);
-            mapGrid.Height = size * mapTiles.GetLength(1);
+            mapGrid.Width = size * tiles.GetLength(0);
+            mapGrid.Height = size * tiles.GetLength(1);
 
-            for (int i = 0; i < mapTiles.GetLength(0); i++)
+            for (int i = 0; i < tiles.GetLength(0); i++)
             {
                 mapGrid.ColumnDefinitions.Add(new ColumnDefinition()
                 {
                     Width = new GridLength(1, GridUnitType.Star)
                 });
             }
-            for (int i = 0; i < mapTiles.GetLength(1); i++)
+            for (int i = 0; i < tiles.GetLength(1); i++)
             {
                 mapGrid.RowDefinitions.Add(new RowDefinition()
                 {
@@ -267,9 +320,9 @@ namespace TDS_MapCreator
                 });
             }
 
-            for (int x = 0; x < mapTiles.GetLength(0); x++)
+            for (int x = 0; x < tiles.GetLength(0); x++)
             {
-                for (int y = 0; y < mapTiles.GetLength(1); y++)
+                for (int y = 0; y < tiles.GetLength(1); y++)
                     CreateGridContent(x, y);
             }
         }
@@ -307,7 +360,7 @@ namespace TDS_MapCreator
             buildingImages[posX, posY] = buildingImage;
             unitImages[posX, posY] = unitImage;
 
-            TileContent tile = mapTiles[posX, posY];
+            TileContent tile = tiles[posX, posY];
             PlaceTile(posX, posY, tile.TileID);
             PlaceBuilding(posX, posY, tile.BuildingID);
             PlaceUnit(posX, posY, tile.UnitID);
@@ -328,11 +381,11 @@ namespace TDS_MapCreator
         private void Rescale()
         {
             int size = TILE_SIZE * tileScale;
-            mapGrid.Width = size * mapTiles.GetLength(0);
-            mapGrid.Height = size * mapTiles.GetLength(1);
-            for (int x = 0; x < mapTiles.GetLength(0); x++)
+            mapGrid.Width = size * tiles.GetLength(0);
+            mapGrid.Height = size * tiles.GetLength(1);
+            for (int x = 0; x < tiles.GetLength(0); x++)
             {
-                for (int y = 0; y < mapTiles.GetLength(1); y++)
+                for (int y = 0; y < tiles.GetLength(1); y++)
                 {
                     tileImages[x, y].Width = size;
                     tileImages[x, y].Height = size;
@@ -344,6 +397,7 @@ namespace TDS_MapCreator
                     unitImages[x, y].Height = size >> 1;
                 }
             }
+            scaleTextBox.Text = tileScale.ToString();
         }
 
         private void ClampTextBoxValue(TextBox box, int min, int max, int resetValue)
@@ -361,7 +415,26 @@ namespace TDS_MapCreator
 
         public void Resize()
         {
+            int oldX = tiles.GetLength(0);
+            int oldY = tiles.GetLength(1);
 
+            int newX = int.Parse(widthTextBox.Text);
+            int newY = int.Parse(heightTextBox.Text);
+
+            TileContent[,] newTiles = new TileContent[newX, newY];
+
+            int copyX = oldX < newX ? oldX : newX;
+            int copyY = oldY < newY ? oldY : newY;
+
+            for (int x = 0; x < copyX; x++)
+            {
+                for (int y = 0; y < copyY; y++)
+                    newTiles[x, y] = tiles[x, y];
+            }
+
+            tiles = newTiles;
+
+            CreateGridFromData();
         }
 
         public void CreateNewMap()
@@ -374,13 +447,13 @@ namespace TDS_MapCreator
                 return;
             }
 
-            mapTiles = new TileContent[width, height];
+            tiles = new TileContent[width, height];
 
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
-                    mapTiles[x, y] = new TileContent()
+                    tiles[x, y] = new TileContent()
                     {
                         TileID = (int)TileType.Grass,
                         BuildingID = (int)BuildingType.None,
@@ -389,7 +462,7 @@ namespace TDS_MapCreator
                 }
             }
 
-            CreateGrid();
+            CreateGridFromData();
         }
 
         public void LoadMap()
@@ -401,15 +474,25 @@ namespace TDS_MapCreator
             if (openFileDialog.ShowDialog() == true)
             {
                 string jsonString = File.ReadAllText(openFileDialog.FileName);
-
-                mapTiles = (TileContent[,])JsonConvert.DeserializeObject(jsonString, typeof(TileContent[,]));
-                CreateGrid();
+                try
+                {
+                    tiles = (TileContent[,])JsonConvert.DeserializeObject(jsonString, typeof(TileContent[,]));
+                    CreateGridFromData();
+                }
+                catch (JsonReaderException)
+                {
+                    _ = MessageBox.Show($"The file \"{openFileDialog.FileName}\" is not a valid JSON file", "Error");
+                }
+                catch (JsonSerializationException)
+                {
+                    _ = MessageBox.Show($"The file \"{openFileDialog.FileName}\" is not a valid TDS Editor file", "Error");
+                }
             }
         }
 
         public void SaveMap()
         {
-            string jsonString = JsonConvert.SerializeObject(mapTiles);
+            string jsonString = JsonConvert.SerializeObject(tiles);
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.DefaultExt = ".txt";
             saveFileDialog.Filter = "Text Document|*.txt";

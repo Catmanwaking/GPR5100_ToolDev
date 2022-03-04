@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,8 @@ namespace Assets.Scripts.Tiles
         [SerializeField] private GameObject ScrollContent;
 
         [SerializeField] private ButtonScript buttonScriptGO;
+
+        [SerializeField] private TMP_Text errorText;
 
         private string path;
 
@@ -37,12 +40,23 @@ namespace Assets.Scripts.Tiles
             var jsonFile = Resources.Load(levelName, typeof(TextAsset)) as TextAsset;
             if (jsonFile == null)
                 throw new ApplicationException($"{levelName} could not be loaded");
-            mapData.MapTiles = (TileContent[,])JsonConvert.DeserializeObject(jsonFile.text, typeof(TileContent[,]));
+            string jsonString = jsonFile.text;
 #else
             string jsonString = File.ReadAllText(Path.Combine(path, $"{levelName}.txt"));
-            mapData.MapTiles = (TileContent[,])JsonConvert.DeserializeObject(jsonString, typeof(TileContent[,]));
 #endif
-            SceneManager.LoadScene(1);
+            try
+            {
+                mapData.MapTiles = (TileContent[,])JsonConvert.DeserializeObject(jsonString, typeof(TileContent[,]));
+                SceneManager.LoadScene(1);
+            }
+            catch (JsonReaderException)
+            {
+                errorText.text = $"Error: \"{levelName}\" is not a valid JSON file";
+            }
+            catch (JsonSerializationException)
+            {
+                errorText.text = $"Error: \"{levelName}\" is not a valid TDS file";
+            }
         }
 
         public void ExitApplication()

@@ -8,7 +8,10 @@ namespace Assets.Scripts.Tiles
     public class TileSpriteDataSO : ScriptableObject
     {
         public TileBase[] MapSprites;
-        public TileBase[] BuildingSprites;
-        public TileBase[] UnitSprites;
+        public TileBase[] BuildingSpritesNeutral;
+        public TileBase[] BuildingSpritesRed;
+        public TileBase[] BuildingSpritesBlack;
+        public TileBase[] UnitSpritesRed;
+        public TileBase[] UnitSpritesBlack;
     }
 }
