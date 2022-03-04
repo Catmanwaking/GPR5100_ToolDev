@@ -1,5 +1,6 @@
 ﻿//Author: Dominik Dohmeier
 using System.Windows;
+using System.Windows.Controls;
 
 namespace TDS_MapCreator
 {
@@ -18,12 +19,19 @@ namespace TDS_MapCreator
             MapManager = new MapManager(MapGrid, MapWidth, MapHeight, MapScale);
         }
 
-        private void LoadMap_Click(object sender, RoutedEventArgs e) => MapManager.LoadMap();
+        private void LoadMap_Click(object sender, RoutedEventArgs e) 
+            => MapManager.LoadMap();
 
-        private void Quit_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
+        private void Quit_Click(object sender, RoutedEventArgs e) 
+            => Application.Current.Shutdown();
 
-        private void SaveMap_Click(object sender, RoutedEventArgs e) => MapManager.SaveMap();
+        private void SaveMap_Click(object sender, RoutedEventArgs e) 
+            => MapManager.SaveMap();
 
-        private void NewMap_Click(object sender, RoutedEventArgs e) => MapManager.CreateNewMap();
+        private void NewMap_Click(object sender, RoutedEventArgs e) 
+            => MapManager.CreateNewMap();
+
+        private void ShowGridlines_Click(object sender, RoutedEventArgs e) 
+            => MapGrid.ShowGridLines = ((MenuItem)sender).IsChecked;           
     }
 }

@@ -31,5 +31,6 @@ public class MapLoader : MonoBehaviour
                     units.SetTile(new Vector3Int(x, height - y - 1), spriteData.UnitSprites[tile.UnitID - 1]);
             }
         }
+        map.RefreshAllTiles();
     }
 }

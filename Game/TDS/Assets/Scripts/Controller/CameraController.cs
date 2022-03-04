@@ -16,6 +16,8 @@ public class CameraController : MonoBehaviour
     private float maxX;
     private float maxY;
 
+    private Vector3 position;
+
     private void Start()
     {
         int width = map.MapTiles.GetLength(0);
@@ -26,12 +28,14 @@ public class CameraController : MonoBehaviour
 
         maxX = (width - CAM_WIDTH) + minX;
         maxY = (height - CAM_HEIGHT) + minY;
+
+        position = transform.position;
     }
 
-    private void Update()
+    public void UpdateCamera()
     {
-        Vector3 position;
         position.x = Mathf.Clamp(followPoint.position.x, minX, maxX);
         position.y = Mathf.Clamp(followPoint.position.y, minY, maxY);
+        transform.position = position;
     }
 }

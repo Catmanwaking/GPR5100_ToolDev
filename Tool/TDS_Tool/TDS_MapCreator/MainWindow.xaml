@@ -17,6 +17,12 @@
                           Click="Quit_Click"/>
             </MenuItem>
 
+            <MenuItem Header="View">
+                <MenuItem Header="Show gridlines" 
+                          IsCheckable="True"
+                          Click="ShowGridlines_Click"/>
+            </MenuItem>
+            
             <MenuItem Header="Help">
                 <MenuItem Header="View Help" />
                 <MenuItem Header="About" />

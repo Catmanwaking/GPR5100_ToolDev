@@ -22,15 +22,13 @@ namespace TDS_MapCreator
         private const int MAX_HEIGHT = 40;
         private const int MAX_SCALE = 10;
 
-        private int tileScale = 2;
-
-        private TileContent[,] mapTiles;
-
         private readonly Grid mapGrid;
         private readonly TextBox widthTextBox;
         private readonly TextBox heightTextBox;
         private readonly TextBox scaleTextBox;
+        private int tileScale = 2;
 
+        private TileContent[,] mapTiles;
         private Image[,] tileImages;
         private Image[,] buildingImages;
         private Image[,] unitImages;
@@ -55,12 +53,19 @@ namespace TDS_MapCreator
             CreateNewMap();
         }
 
+        #region Place and Remove
+
         private void PlaceTile(int posX, int posY)
         {
             int tileIndex = MainWindow.TileSeletionManager.GetTileIndex();
             PlaceTile(posX, posY, tileIndex);
 
-            //TODO check if building or unit needs to be removed
+            if (tileIndex != (int)TileType.Grass)
+                PlaceBuilding(posX, posY, 0);
+
+            int unitIndex = DataUtilities.ToIndex(mapTiles[posX, posY].UnitID);
+            if (unitIndex != 0 && !DataUtilities.unitTileMatrix[unitIndex - 1, tileIndex])
+                PlaceUnit(posX, posY, 0);
         }
 
         private void PlaceTile(int posX, int posY, int tileIndex)
@@ -73,70 +78,100 @@ namespace TDS_MapCreator
         {
             int tileIndex = MainWindow.TileSeletionManager.GetTileIndex();
             int colorIndex = MainWindow.TileSeletionManager.GetColorIndex();
-            int buildingID = (int)BuildingType.None;
 
             if (tileIndex == (int)BuildingType.None)
-                PlaceBuilding(posX, posY, buildingID);
+                PlaceBuilding(posX, posY, 0);
             else
             {
                 if (tileIndex == (int)BuildingType.HQ && colorIndex == 0)
                     return;
 
                 PlaceTile(posX, posY, (int)TileType.Grass);
-                buildingID = tileIndex + (colorIndex * DataUtilities.BUILDING_COUNT);
 
-                if (DataUtilities.IsHQ(buildingID))
-                    SearchAndRemove(buildingID);
+                int unitIndex = DataUtilities.ToIndex(mapTiles[posX, posY].UnitID);
+                if (unitIndex != 0 && !DataUtilities.unitTileMatrix[unitIndex - 1, (int)TileType.Grass])
+                    PlaceUnit(posX, posY, 0);
 
-                PlaceBuilding(posX, posY, buildingID);
+                if (tileIndex == (int)BuildingType.HQ)
+                    SearchAndRemoveHQ(colorIndex);
+
+                PlaceBuilding(posX, posY, tileIndex, colorIndex);
             }
         }
 
-        private void PlaceBuilding(int posX, int posY, int buildingIndex)
+        private void PlaceBuilding(int posX, int posY, int buildingID)
         {
-            mapTiles[posX, posY].BuildingID = buildingIndex;
+            int buildingIndex = DataUtilities.ToIndex(buildingID);
+            int colorIndex = DataUtilities.ToColorIndex(buildingID);
 
+            mapTiles[posX, posY].BuildingID = buildingID;
             if (buildingIndex == 0)
                 buildingImages[posX, posY].Source = null;
             else
-                buildingImages[posX, posY].Source = new BitmapImage(DataUtilities.BuildingSprites[buildingIndex - 2]);
+                buildingImages[posX, posY].Source = new BitmapImage(DataUtilities.BuildingSprites[colorIndex][buildingIndex - 1]);
+        }
+
+        private void PlaceBuilding(int posX, int posY, int buildingIndex, int colorIndex)
+        {
+            mapTiles[posX, posY].BuildingID = DataUtilities.ToID(buildingIndex, colorIndex);
+            if (buildingIndex == 0)
+                buildingImages[posX, posY].Source = null;
+            else
+                buildingImages[posX, posY].Source = new BitmapImage(DataUtilities.BuildingSprites[colorIndex][buildingIndex - 1]);
         }
 
         private void PlaceUnit(int posX, int posY)
         {
             int tileIndex = MainWindow.TileSeletionManager.GetTileIndex();
             int colorIndex = MainWindow.TileSeletionManager.GetColorIndex();
-            int unitID = (int)UnitType.None;
 
             if (tileIndex == (int)UnitType.None)
-                PlaceUnit(posX, posY, unitID);
+                PlaceUnit(posX, posY, 0);
             else
             {
-                unitID = tileIndex + (colorIndex * DataUtilities.UNIT_COUNT);
-                PlaceUnit(posX, posY, unitID);
+                int tile = mapTiles[posX, posY].TileID;
+                if (DataUtilities.unitTileMatrix[tileIndex - 1, tile])
+                    PlaceUnit(posX, posY, tileIndex, colorIndex);
             }
         }
 
-        private void PlaceUnit(int posX, int posY, int UnitIndex)
+        private void PlaceUnit(int posX, int posY, int UnitID)
         {
-            mapTiles[posX, posY].UnitID = UnitIndex;
-            if (UnitIndex == 0)
+            int unitIndex = DataUtilities.ToIndex(UnitID);
+            int colorIndex = DataUtilities.ToColorIndex(UnitID);
+
+            mapTiles[posX, posY].UnitID = UnitID;
+            if (unitIndex == 0)
                 unitImages[posX, posY].Source = null;
             else
-                unitImages[posX, posY].Source = new BitmapImage(DataUtilities.UnitSprites[UnitIndex - 1]);
+                unitImages[posX, posY].Source = new BitmapImage(DataUtilities.UnitSprites[colorIndex][unitIndex - 1]);
         }
 
-        private void SearchAndRemove(int buildingID)
+        private void PlaceUnit(int posX, int posY, int unitIndex, int colorIndex)
         {
+            mapTiles[posX, posY].UnitID = DataUtilities.ToID(unitIndex, colorIndex);
+            if (unitIndex == 0)
+                unitImages[posX, posY].Source = null;
+            else
+                unitImages[posX, posY].Source = new BitmapImage(DataUtilities.UnitSprites[colorIndex][unitIndex - 1]);
+        }
+
+        private void SearchAndRemoveHQ(int colorID)
+        {
+            int searchID = DataUtilities.ToID((int)BuildingType.HQ, colorID);
             for (int x = 0; x < mapTiles.GetLength(0); x++)
             {
                 for (int y = 0; y < mapTiles.GetLength(1); y++)
                 {
-                    if (mapTiles[x, y].BuildingID == buildingID)
+                    if (mapTiles[x, y].BuildingID == searchID)
                         PlaceBuilding(x, y, (int)BuildingType.None);
                 }
             }
         }
+
+        #endregion Place and Remove
+
+        #region Events
 
         private void WidthTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -168,19 +203,6 @@ namespace TDS_MapCreator
             }
         }
 
-        private void ClampTextBoxValue(TextBox box, int min, int max, int resetValue)
-        {
-            if (int.TryParse(box.Text, out int value))
-            {
-                if (value < min)
-                    box.Text = min.ToString();
-                else if (value > max)
-                    box.Text = max.ToString();
-            }
-            else
-                box.Text = resetValue.ToString();
-        }
-
         private void Image_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
@@ -210,6 +232,8 @@ namespace TDS_MapCreator
                     break;
             }
         }
+
+        #endregion Events
 
         private void CreateGrid()
         {
@@ -289,7 +313,7 @@ namespace TDS_MapCreator
             PlaceUnit(posX, posY, tile.UnitID);
         }
 
-        private void SetImageValues(Image image,int posX, int posY, int Zindex)
+        private void SetImageValues(Image image, int posX, int posY, int Zindex)
         {
             image.Stretch = Stretch.Uniform;
             image.MouseDown += Image_MouseDown;
@@ -299,6 +323,45 @@ namespace TDS_MapCreator
             Grid.SetRow(image, posY);
             Panel.SetZIndex(image, Zindex);
             _ = mapGrid.Children.Add(image);
+        }
+
+        private void Rescale()
+        {
+            int size = TILE_SIZE * tileScale;
+            mapGrid.Width = size * mapTiles.GetLength(0);
+            mapGrid.Height = size * mapTiles.GetLength(1);
+            for (int x = 0; x < mapTiles.GetLength(0); x++)
+            {
+                for (int y = 0; y < mapTiles.GetLength(1); y++)
+                {
+                    tileImages[x, y].Width = size;
+                    tileImages[x, y].Height = size;
+
+                    buildingImages[x, y].Width = size >> 1;
+                    buildingImages[x, y].Height = size;
+
+                    unitImages[x, y].Width = size >> 1;
+                    unitImages[x, y].Height = size >> 1;
+                }
+            }
+        }
+
+        private void ClampTextBoxValue(TextBox box, int min, int max, int resetValue)
+        {
+            if (int.TryParse(box.Text, out int value))
+            {
+                if (value < min)
+                    box.Text = min.ToString();
+                else if (value > max)
+                    box.Text = max.ToString();
+            }
+            else
+                box.Text = resetValue.ToString();
+        }
+
+        public void Resize()
+        {
+
         }
 
         public void CreateNewMap()
@@ -327,27 +390,6 @@ namespace TDS_MapCreator
             }
 
             CreateGrid();
-        }
-
-        private void Rescale()
-        {
-            int size = TILE_SIZE * tileScale;
-            mapGrid.Width = size * mapTiles.GetLength(0);
-            mapGrid.Height = size * mapTiles.GetLength(1);
-            for (int x = 0; x < mapTiles.GetLength(0); x++)
-            {
-                for (int y = 0; y < mapTiles.GetLength(1); y++)
-                {
-                    tileImages[x, y].Width = size;
-                    tileImages[x, y].Height = size;
-
-                    buildingImages[x, y].Width = size >> 1;
-                    buildingImages[x, y].Height = size;
-
-                    unitImages[x, y].Width = size >> 1;
-                    unitImages[x, y].Height = size >> 1;
-                }
-            }
         }
 
         public void LoadMap()

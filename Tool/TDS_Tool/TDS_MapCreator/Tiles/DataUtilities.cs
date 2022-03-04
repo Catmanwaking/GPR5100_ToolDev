@@ -2,8 +2,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Brush = System.Windows.Media.Brush;
-using Brushes = System.Windows.Media.Brushes;
 
 namespace TDS_MapCreator.Tiles
 {
@@ -68,10 +66,6 @@ namespace TDS_MapCreator.Tiles
 
     internal static class DataUtilities
     {
-        public const int TILE_COUNT = 8;
-        public const int BUILDING_COUNT = 5;
-        public const int UNIT_COUNT = 19;
-
         private static readonly string spriteDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\Sprites");
 
         private static readonly int[] HQIDs =
@@ -79,6 +73,10 @@ namespace TDS_MapCreator.Tiles
             ((int)BuildingType.HQ) + (((int)BuildingColors.Red) * BUILDING_COUNT),
             ((int)BuildingType.HQ) + (((int)BuildingColors.Black) * BUILDING_COUNT),
         };
+
+        public const int TILE_COUNT = 8;
+        public const int BUILDING_COUNT = 5;
+        public const int UNIT_COUNT = 19;
 
         public static readonly Uri[] TileSprites =
         {
@@ -92,72 +90,119 @@ namespace TDS_MapCreator.Tiles
             new Uri($"{spriteDirectory}\\Tiles\\Riffs.png"),
         };
 
-        public static readonly Uri[] UnitSprites =
+        public static readonly Uri[][] UnitSprites =
         {
-            new Uri($"{spriteDirectory}\\Units\\Red\\Infantry.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Mech.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Recon.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Tank.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Medium_Tank.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Neotank.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\APC.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Artillery.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Rocket.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Anti-Air.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Missiles.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Lander.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Cruiser.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Submarine.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Battleship.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\B_Copter.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\T_Copter.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Fighter.png"),
-            new Uri($"{spriteDirectory}\\Units\\Red\\Bomber.png"),
-
-            new Uri($"{spriteDirectory}\\Units\\Black\\Infantry.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Mech.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Recon.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Tank.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Medium_Tank.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Neotank.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\APC.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Artillery.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Rocket.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Anti-Air.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Missiles.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Lander.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Cruiser.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Submarine.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Battleship.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\B_Copter.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\T_Copter.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Fighter.png"),
-            new Uri($"{spriteDirectory}\\Units\\Black\\Bomber.png"),
+            new []
+            {
+                new Uri($"{spriteDirectory}\\Units\\Red\\Infantry.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Mech.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Recon.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Tank.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Medium_Tank.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Neotank.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\APC.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Artillery.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Rocket.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Anti-Air.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Missiles.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Lander.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Cruiser.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Submarine.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Battleship.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\B_Copter.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\T_Copter.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Fighter.png"),
+                new Uri($"{spriteDirectory}\\Units\\Red\\Bomber.png"),
+            },
+            new []
+            {
+                new Uri($"{spriteDirectory}\\Units\\Black\\Infantry.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Mech.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Recon.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Tank.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Medium_Tank.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Neotank.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\APC.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Artillery.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Rocket.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Anti-Air.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Missiles.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Lander.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Cruiser.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Submarine.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Battleship.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\B_Copter.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\T_Copter.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Fighter.png"),
+                new Uri($"{spriteDirectory}\\Units\\Black\\Bomber.png"),
+            }
         };
 
-        public static readonly Uri[] BuildingSprites =
+        public static readonly Uri[][] BuildingSprites =
         {
-            new Uri($"{spriteDirectory}\\Buildings\\Neutral\\Town.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Neutral\\Base.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Neutral\\Airport.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Neutral\\Harbor.png"),
-
-            new Uri($"{spriteDirectory}\\Buildings\\Red\\HQ.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Red\\Town.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Red\\Base.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Red\\Airport.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Red\\Harbor.png"),
-
-            new Uri($"{spriteDirectory}\\Buildings\\Black\\HQ.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Black\\Town.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Black\\Base.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Black\\Airport.png"),
-            new Uri($"{spriteDirectory}\\Buildings\\Black\\Harbor.png"),
+            new []
+            {
+                null,
+                new Uri($"{spriteDirectory}\\Buildings\\Neutral\\Town.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Neutral\\Base.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Neutral\\Airport.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Neutral\\Harbor.png"),
+            },
+            new []
+            {
+                new Uri($"{spriteDirectory}\\Buildings\\Red\\HQ.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Red\\Town.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Red\\Base.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Red\\Airport.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Red\\Harbor.png"),
+            },
+            new []
+            {
+                new Uri($"{spriteDirectory}\\Buildings\\Black\\HQ.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Black\\Town.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Black\\Base.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Black\\Airport.png"),
+                new Uri($"{spriteDirectory}\\Buildings\\Black\\Harbor.png"),
+            }
         };
 
-        public static bool IsHQ(int ID)
+        public static readonly bool[,] unitTileMatrix =
         {
-            return HQIDs.Contains(ID);
+            //plains, forest, mountains, street, bridge, river, water, reefs
+            { true, true, true, true, true, true, false, false },       //infantry
+            { true, true, true, true, true, true, false, false },       //mech
+            { true, true, false, true, true, false, false, false },     //recon
+            { true, true, false, true, true, false, false, false },     //tank
+            { true, true, false, true, true, false, false, false },     //medium-tank
+            { true, true, false, true, true, false, false, false },     //neotank
+            { true, true, false, true, true, false, false, false },     //apc
+            { true, true, false, true, true, false, false, false },     //artillery
+            { true, true, false, true, true, false, false, false },     //rocket
+            { true, true, false, true, true, false, false, false },     //anti-air
+            { true, true, false, true, true, false, false, false },     //missile
+            { false, false, false, false, false, false, true, true },   //lander
+            { false, false, false, false, false, false, true, true },   //cruiser
+            { false, false, false, false, false, false, true, true },   //submarine
+            { false, false, false, false, false, false, true, true },   //battleship
+            { true, true, true, true, true, true, true, true },         //b_copter
+            { true, true, true, true, true, true, true, true },         //t_copter
+            { true, true, true, true, true, true, true, true },         //fighter
+            { true, true, true, true, true, true, true, true },         //bomber
+        };
+
+        public static int ToID(int index, int colorIndex)
+        {
+            return (colorIndex << 5) + index;
+        }
+
+        public static int ToIndex(int ID)
+        {
+            return ID & 0b0001_1111;
+        }
+
+        public static int ToColorIndex(int ID)
+        {
+            return (ID & 0b1110_0000) >> 5;
         }
     }
 }
