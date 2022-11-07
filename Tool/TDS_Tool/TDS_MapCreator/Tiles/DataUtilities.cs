@@ -1,7 +1,7 @@
 ﻿//Author: Dominik Dohmeier
 using System;
 using System.IO;
-using System.Linq;
+using System.Reflection;
 
 namespace TDS_MapCreator.Tiles
 {
@@ -66,17 +66,28 @@ namespace TDS_MapCreator.Tiles
 
     internal static class DataUtilities
     {
+#if DEBUG
         private static readonly string spriteDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\Sprites");
-
-        private static readonly int[] HQIDs =
-        {
-            ((int)BuildingType.HQ) + (((int)BuildingColors.Red) * BUILDING_COUNT),
-            ((int)BuildingType.HQ) + (((int)BuildingColors.Black) * BUILDING_COUNT),
-        };
-
+#else
+        private static readonly string spriteDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sprites");
+#endif
         public const int TILE_COUNT = 8;
         public const int BUILDING_COUNT = 5;
         public const int UNIT_COUNT = 19;
+
+        public static readonly string Help =
+            $"First Set the size of the map according to your needs and press either \"Resize\" or create a new map using \"Ctrl+N\"." +
+            $"Select the tiletype you wish to place, then specify which tile of the selected tiletype you want and if necessary select a color." +
+            $"Tiles have no colors, Buildings are either neutral (white), red or black and units are either red or black.\n\n" +
+            $"To draw onto the tilemap simply click and drag to draw where you want to place the selected tile.\n" +
+            $"To remove a tile either right click it or select \"none\" and draw over it.\n" +
+            $"To zoom in or out hold Ctrl and use the mousewheel or press (+)/(-)\n\n" +
+            $"There are certain rules the editor applies automatically like, you can only place one HQ of each color or tanks can't be placed on mountains." +
+            $"So if something can't be placed, it's against the rules";
+
+        public static readonly string About = $"TDS Editor version {Assembly.GetExecutingAssembly().GetName().Version}\n\n" +
+            $"Advance Wars Map Editor for use with the Unity Application \"TDS\"\n" +
+            $"2022 Dominik Dohmeier";
 
         public static readonly Uri[] TileSprites =
         {

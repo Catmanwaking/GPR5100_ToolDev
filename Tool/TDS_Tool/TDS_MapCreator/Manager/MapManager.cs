@@ -18,7 +18,6 @@ namespace TDS_MapCreator
         private const int TILE_SIZE = 16;
         private const int MIN_WIDTH = 15;
         private const int MIN_HEIGHT = 10;
-        private const int MIN_SCALE = 1;
         private const int MAX_WIDTH = 60;
         private const int MAX_HEIGHT = 40;
         private const int MAX_SCALE = 10;
@@ -26,7 +25,6 @@ namespace TDS_MapCreator
         private readonly Grid mapGrid;
         private readonly TextBox widthTextBox;
         private readonly TextBox heightTextBox;
-        private readonly TextBox scaleTextBox;
         private int tileScale = 2;
 
         private TileContent[,] tiles;
@@ -34,7 +32,7 @@ namespace TDS_MapCreator
         private Image[,] buildingImages;
         private Image[,] unitImages;
 
-        public MapManager(Grid grid, TextBox width, TextBox height, TextBox scale)
+        public MapManager(Grid grid, TextBox width, TextBox height)
         {
             mapGrid = grid;
             mapGrid.PreviewMouseWheel += MapGrid_PreviewMouseWheel;
@@ -46,11 +44,6 @@ namespace TDS_MapCreator
             heightTextBox = height;
             heightTextBox.Text = MIN_HEIGHT.ToString();
             heightTextBox.LostFocus += HeightTextBox_LostFocus;
-
-            scaleTextBox = scale;
-            scaleTextBox.Text = tileScale.ToString();
-            scaleTextBox.LostFocus += ScaleTextBox_LostFocus;
-            scaleTextBox.KeyDown += ScaleTextBox_KeyDown;
 
             CreateNewMap();
         }
@@ -225,24 +218,6 @@ namespace TDS_MapCreator
             e.Handled = true;
         }
 
-        private void ScaleTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            ClampTextBoxValue(scaleTextBox, MIN_SCALE, MAX_SCALE, tileScale);
-            tileScale = int.Parse(scaleTextBox.Text);
-            Rescale();
-            e.Handled = true;
-        }
-
-        private void ScaleTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == System.Windows.Input.Key.Enter)
-            {
-                ClampTextBoxValue(scaleTextBox, MIN_SCALE, MAX_SCALE, tileScale);
-                tileScale = int.Parse(scaleTextBox.Text);
-                Rescale();
-            }
-        }
-
         private void Image_MouseEnter(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -252,7 +227,7 @@ namespace TDS_MapCreator
                 int posY = Grid.GetRow(image);
 
                 Place(posX, posY);
-            } 
+            }
             else if (e.RightButton == MouseButtonState.Pressed)
             {
                 Image image = (Image)sender;
@@ -282,7 +257,7 @@ namespace TDS_MapCreator
                     tileScale--;
                     Rescale();
                 }
-
+                e.Handled = true;
             }
         }
 
@@ -378,6 +353,19 @@ namespace TDS_MapCreator
             _ = mapGrid.Children.Add(image);
         }
 
+        private void ClampTextBoxValue(TextBox box, int min, int max, int resetValue)
+        {
+            if (int.TryParse(box.Text, out int value))
+            {
+                if (value < min)
+                    box.Text = min.ToString();
+                else if (value > max)
+                    box.Text = max.ToString();
+            }
+            else
+                box.Text = resetValue.ToString();
+        }
+
         private void Rescale()
         {
             int size = TILE_SIZE * tileScale;
@@ -397,20 +385,24 @@ namespace TDS_MapCreator
                     unitImages[x, y].Height = size >> 1;
                 }
             }
-            scaleTextBox.Text = tileScale.ToString();
         }
 
-        private void ClampTextBoxValue(TextBox box, int min, int max, int resetValue)
+        public void ZoomIn()
         {
-            if (int.TryParse(box.Text, out int value))
+            if (tileScale < MAX_SCALE)
             {
-                if (value < min)
-                    box.Text = min.ToString();
-                else if (value > max)
-                    box.Text = max.ToString();
+                tileScale++;
+                Rescale();
             }
-            else
-                box.Text = resetValue.ToString();
+        }
+
+        public void ZoomOut()
+        {
+            if (tileScale > 1)
+            {
+                tileScale--;
+                Rescale();
+            }
         }
 
         public void Resize()
@@ -467,10 +459,12 @@ namespace TDS_MapCreator
 
         public void LoadMap()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.DefaultExt = ".txt";
-            openFileDialog.Filter = "Text Document|*.txt";
-            openFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                DefaultExt = ".txt",
+                Filter = "Text Document|*.txt",
+                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory
+            };
             if (openFileDialog.ShowDialog() == true)
             {
                 string jsonString = File.ReadAllText(openFileDialog.FileName);
@@ -493,10 +487,12 @@ namespace TDS_MapCreator
         public void SaveMap()
         {
             string jsonString = JsonConvert.SerializeObject(tiles);
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.DefaultExt = ".txt";
-            saveFileDialog.Filter = "Text Document|*.txt";
-            saveFileDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                DefaultExt = ".txt",
+                Filter = "Text Document|*.txt",
+                InitialDirectory = AppDomain.CurrentDomain.BaseDirectory
+            };
             if (saveFileDialog.ShowDialog() == true)
                 File.WriteAllText(saveFileDialog.FileName, jsonString);
         }

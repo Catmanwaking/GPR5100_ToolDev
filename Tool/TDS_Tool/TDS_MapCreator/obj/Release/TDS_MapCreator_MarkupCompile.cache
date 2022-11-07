@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Debug\
+E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Release\
 TDS_MapCreator
 none
 false
-DEBUG;TRACE
+TRACE
 E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\App.xaml
-11151548125
+1219584333
 
-11-207298100
-25450716211
+101514337122
+25-1506965146
 MainWindow.xaml;
 
-True
+False
 

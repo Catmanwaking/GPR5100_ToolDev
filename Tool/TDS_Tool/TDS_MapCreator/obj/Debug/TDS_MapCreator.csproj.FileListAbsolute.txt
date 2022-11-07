@@ -1,4 +1,3 @@
-E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Debug\TDS_MapCreator.csproj.AssemblyReference.cache
 E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Debug\MainWindow.baml
 E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Debug\MainWindow.g.cs
 E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Debug\App.g.cs
@@ -31,3 +30,5 @@ E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\bin\Debug\System.ValueTuple.
 E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Debug\TDS_MapCreator.csproj.CopyComplete
 E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\bin\Debug\Newtonsoft.Json.dll
 E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\bin\Debug\Newtonsoft.Json.xml
+E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Debug\TDS_MapCreator_MarkupCompile.lref
+E:\GIT\GPR5100_ToolDev\Tool\TDS_Tool\TDS_MapCreator\obj\Debug\TDS_MapCreator.csproj.AssemblyReference.cache

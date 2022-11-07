@@ -22,6 +22,7 @@ namespace Assets.Scripts.Tiles
         private void Start()
         {
 #if UNITY_EDITOR
+            Debug.Log(AppDomain.CurrentDomain.BaseDirectory);
             string[] levels = { "DebugMap" };
 #else
             path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Levels");

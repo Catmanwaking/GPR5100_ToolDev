@@ -3,31 +3,40 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TDS_MapCreator"
         mc:Ignorable="d"
         Title="TDS Editor" Height="464" Width="800"
         MinHeight="464" MinWidth="400">
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="NewCommand_Executed" />
+        <CommandBinding Command="Open" Executed="OpenCommand_Executed" />
+        <CommandBinding Command="SaveAs" Executed="SaveAsCommand_Executed" />
+        <CommandBinding Command="local:CustomCommands.ShowGridLines" Executed="ShowGridlinesCommand_Executed" />
+        <CommandBinding Command="IncreaseZoom" Executed="IncreaseZoomCommand_Executed" />
+        <CommandBinding Command="DecreaseZoom" Executed="DecreaseZoomCommand_Executed" />
+        <CommandBinding Command="Help" Executed="HelpCommand_Executed" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="SaveAs" />
+        <KeyBinding Key="OemPlus" Modifiers="Ctrl" Command="IncreaseZoom" />
+        <KeyBinding Key="OemMinus" Modifiers="Ctrl" Command="DecreaseZoom" />
+    </Window.InputBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
-                <MenuItem Header="New" 
-                          Click="New_Click"/>
-                <MenuItem Header="Load Map" 
-                          Click="LoadMap_Click"/>
-                <MenuItem Header="Save Map" 
-                          Click="SaveMap_Click"/>
-                <MenuItem Header="Quit" 
-                          Click="Quit_Click"/>
+                <MenuItem Command="New" />
+                <MenuItem Header="Open..." Command="Open" />
+                <MenuItem Header="Save As..." Command="SaveAs" InputGestureText="Strg+S" />
+                <MenuItem Name="menuQuit" Header="Exit" Click="Quit_Click" InputGestureText="Alt+F4" />
             </MenuItem>
-
             <MenuItem Header="View">
-                <MenuItem Header="Show gridlines" 
-                          IsCheckable="True"
-                          Click="ShowGridlines_Click"/>
+                <MenuItem Header="Show gridlines" IsCheckable="True" Command="local:CustomCommands.ShowGridLines" x:Name="gridLines"/>
+                <MenuItem Header="Zoom In" Command="IncreaseZoom" InputGestureText="Strg+(+)" />
+                <MenuItem Header="Zoom Out" Command="DecreaseZoom" InputGestureText="Strg+(-)" />
             </MenuItem>
-            
             <MenuItem Header="Help">
-                <MenuItem Header="View Help" />
-                <MenuItem Header="About" />
+                <MenuItem Header="View Help" Command="Help" />
+                <MenuItem Header="About" Click="About_Click" />
             </MenuItem>
         </Menu>
 
@@ -36,58 +45,38 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="150" />
             </Grid.ColumnDefinitions>
-
-            <ScrollViewer Grid.Column="0"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto">
-                <Grid x:Name="MapGrid"/>
+            
+            <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid x:Name="MapGrid" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10*"/>
+                        <ColumnDefinition Width="311*"/>
+                    </Grid.ColumnDefinitions>
+                </Grid>
             </ScrollViewer>
-
             <StackPanel Grid.Column="1">
-                <GroupBox Header="Map"
-                          Margin="10"
-                          Padding="10">
+                <GroupBox Header="Map" Margin="10" Padding="10">
                     <StackPanel>
                         <TextBlock Text="Width" />
-                        <TextBox Text="15" 
-                                 x:Name="MapWidth"/>
+                        <TextBox Text="15" x:Name="MapWidth" />
                         <TextBlock Text="Height" />
-                        <TextBox Text="10" 
-                                 x:Name="MapHeight"/>
-                        <Button Content="Resize" 
-                                Margin="0 5 0 0"
-                                Click="Resize_Click"/>
+                        <TextBox Text="10" x:Name="MapHeight" />
+                        <Button Content="Resize" Margin="0 5 0 0" Click="Resize_Click" />
                     </StackPanel>
                 </GroupBox>
-
-                <GroupBox Header="Scale"
-                          Margin="10 0"
-                          Padding="10">
-                    <TextBox Text="2"
-                             x:Name="MapScale"/>
-                </GroupBox>
-
-                <GroupBox Header="TileType"
-                          Margin="10"
-                          Padding="10">
+                <GroupBox Header="TileType" Margin="10" Padding="10">
                     <StackPanel>
                         <TextBlock Text="Type" />
                         <ComboBox x:Name="TileTypeSelector">
-                            <ComboBoxItem Content="Map"/>
+                            <ComboBoxItem Content="Map" />
                             <ComboBoxItem Content="Buildings" />
                             <ComboBoxItem Content="Units" />
                         </ComboBox>
-                        
-                        <TextBlock Text="Tile" Margin="0 10 0 0"/>
-                        <ComboBox x:Name="TileSelector"
-                                  MaxDropDownHeight="180">
+                        <TextBlock Text="Tile" Margin="0 10 0 0" />
+                        <ComboBox x:Name="TileSelector" MaxDropDownHeight="180">
                         </ComboBox>
-                        
-                        <TextBlock Text="Color"
-                                   Margin="0 10 0 0"/>
-                        <ComboBox x:Name="ColorSelector"
-                                  MaxDropDownHeight="180">
-                            
+                        <TextBlock Text="Color" Margin="0 10 0 0" />
+                        <ComboBox x:Name="ColorSelector" MaxDropDownHeight="180">
                         </ComboBox>
                     </StackPanel>
                 </GroupBox>
